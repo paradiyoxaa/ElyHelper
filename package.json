@@ -1,0 +1,18 @@
+{
+  "name": "elyhelper",
+  "version": "1.0.0",
+  "description": "**ElyHelper** turns any image containing words (handwritten or typed study notes, textbook diagrams, slides, flashcards) into interactive study materials and PDF files where words are concealed behind masks that reveal when clicked or hovered, and re-hide when clicked again or hovered out.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "lucide": "^1.47.0",
+    "pdf-lib": "^1.17.1",
+    "tesseract.js": "^7.0.0"
+  }
+}

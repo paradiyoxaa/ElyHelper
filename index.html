@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ElyHelper — Interactive Hide-and-Reveal Study Deck</title>
+  <meta name="description" content="Turn any image with text into interactive study sheets where words are hidden unless clicked or hovered. Works 100% offline.">
+
+  <!-- Local Libraries (100% Offline, Zero Internet Required) -->
+  <script src="libs/lucide.min.js"></script>
+  <script src="libs/tesseract.min.js"></script>
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css?v=5">
+</head>
+<body>
+
+  <!-- Top Navigation Header (Clean & Minimal) -->
+  <header>
+    <div class="header-container">
+      <div class="logo-group">
+        <div class="logo-icon">
+          <i data-lucide="eye-off" style="width: 18px; height: 18px;"></i>
+        </div>
+        <div class="logo-text">
+          <h1>ElyHelper</h1>
+          <span>Interactive Study Deck Studio</span>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <button id="nav-btn-api" class="btn btn-outline btn-sm" title="Gemini AI Key Settings">
+          <i data-lucide="sparkles" style="width: 14px; height: 14px; color: var(--accent-warm);"></i> AI Vision Active
+        </button>
+        <button id="nav-btn-reset" class="btn btn-secondary btn-sm" style="display: none;">
+          <i data-lucide="image-plus" style="width: 14px; height: 14px;"></i> Open New Image
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Simple Drag & Drop Upload Zone (No Bloat) -->
+    <section id="upload-section" class="hero-section">
+      <h2 class="hero-title">
+        Interactive <span class="gradient-text">Hide-and-Reveal</span> Study Deck
+      </h2>
+      <p class="hero-desc">
+        Drop any study diagram, textbook page, or anatomy sheet. Words are auto-detected and hidden behind interactive masks that reveal on hover or click.
+      </p>
+
+      <div class="upload-wrapper">
+        <div id="drop-zone" class="drop-zone">
+          <div class="drop-content">
+            <div class="drop-icon-box">
+              <i data-lucide="upload" style="width: 28px; height: 28px;"></i>
+            </div>
+            <div class="drop-title">Select or drop your image here</div>
+            <div class="drop-subtitle">Click to browse, drag & drop, or paste directly with <kbd>Ctrl+V</kbd></div>
+            <input type="file" id="file-input" accept="image/*" style="display: none;">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scanning Progress Indicator -->
+    <div id="progress-card" class="progress-card">
+      <div class="progress-header">
+        <span id="progress-status-text" class="progress-status-text">
+          <i data-lucide="loader" class="spin" style="width: 16px; height: 16px;"></i> Scanning image for words...
+        </span>
+        <span id="progress-pct" class="progress-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div id="progress-bar-fill" class="progress-bar-fill"></div>
+      </div>
+    </div>
+
+    <!-- Studio Workspace -->
+    <section id="studio-wrapper" class="studio-wrapper">
+      
+      <!-- Studio Toolbar -->
+      <div class="studio-toolbar">
+        
+        <!-- Reveal Mode -->
+        <div class="tool-group">
+          <span class="tool-label">Trigger:</span>
+          <div class="pill-group" id="mode-selector">
+            <button class="pill-btn" data-mode="hover" title="Reveal on hover, hide on mouse leave">Hover</button>
+            <button class="pill-btn" data-mode="click" title="Click to reveal/hide">Click</button>
+            <button class="pill-btn active" data-mode="both" title="Hover to peek, click to lock">Both</button>
+          </div>
+        </div>
+
+        <div class="tool-divider"></div>
+
+        <!-- Mask Style -->
+        <div class="tool-group">
+          <span class="tool-label">Style:</span>
+          <div class="pill-group" id="style-selector">
+            <button class="pill-btn active" data-style="black">Matte</button>
+            <button class="pill-btn" data-style="neon">Amber</button>
+            <button class="pill-btn" data-style="blur">Frosted</button>
+            <button class="pill-btn" data-style="badge">Badge (?)</button>
+          </div>
+        </div>
+
+        <div class="tool-divider"></div>
+
+        <!-- Grouping: Full Labels vs Single Words -->
+        <div class="tool-group">
+          <span class="tool-label">Units:</span>
+          <div class="pill-group" id="group-selector">
+            <button class="pill-btn active" data-group="labels" title="Group adjacent words into complete anatomical labels (e.g. 'frontal bone')">Labels</button>
+            <button class="pill-btn" data-group="words" title="Mask each individual word separately">Words</button>
+          </div>
+        </div>
+
+        <div class="tool-divider"></div>
+
+        <!-- Quick Masking & Editing Tools -->
+        <div class="tool-group">
+          <button id="btn-draw-mode" class="btn btn-outline btn-sm" title="Click and drag to draw a mask over any custom word or area">
+            <i data-lucide="crop" style="width: 14px; height: 14px;"></i> Draw Box
+          </button>
+          <button id="btn-click-mask-mode" class="btn btn-outline btn-sm" title="Tap directly on any text or diagram label to mask it instantly">
+            <i data-lucide="mouse-pointer-click" style="width: 14px; height: 14px;"></i> Tap to Mask
+          </button>
+          <button id="btn-eraser-mode" class="btn btn-outline btn-sm" title="Remove Mask Tool: Click any mask to erase it">
+            <i data-lucide="eraser" style="width: 14px; height: 14px;"></i> Remove Mask
+          </button>
+        </div>
+
+        <div class="tool-divider"></div>
+
+        <!-- Word Detection Sensitivity / Filter -->
+        <div class="tool-group">
+          <div class="slider-group" title="Adjust word size filter">
+            <span>Min Size:</span>
+            <input type="range" id="slider-min-length" min="1" max="6" value="1">
+            <span id="label-min-length" style="font-weight: 700; color: var(--accent-warm); width: 12px;">1</span>
+          </div>
+
+          <div class="search-container">
+            <i data-lucide="search" class="search-icon" style="width: 13px; height: 13px;"></i>
+            <input type="text" id="input-search-filter" class="input-search" placeholder="Filter words...">
+          </div>
+        </div>
+
+        <div class="tool-divider"></div>
+
+        <!-- Select / Clear Toggles -->
+        <div class="tool-group">
+          <button id="btn-select-all" class="btn btn-outline btn-sm">Mask All</button>
+          <button id="btn-clear-all" class="btn btn-outline btn-sm">Clear All</button>
+          <span id="badge-mask-count" class="badge-tag">0 Masked</span>
+        </div>
+
+      </div>
+
+      <!-- Stage Viewport -->
+      <div id="stage-container" class="stage-container">
+        <div id="stage-viewport" class="stage-viewport">
+          <img id="preview-image" alt="Document">
+          <div id="mask-overlay-layer" class="mask-overlay-layer"></div>
+        </div>
+
+        <!-- Floating Stage Zoom Controls -->
+        <div class="stage-controls">
+          <button id="btn-zoom-in" class="stage-btn" title="Zoom In">
+            <i data-lucide="zoom-in" style="width: 15px; height: 15px;"></i>
+          </button>
+          <button id="btn-zoom-out" class="stage-btn" title="Zoom Out">
+            <i data-lucide="zoom-out" style="width: 15px; height: 15px;"></i>
+          </button>
+          <button id="btn-zoom-fit" class="stage-btn" title="Fit to Screen">
+            <i data-lucide="maximize" style="width: 15px; height: 15px;"></i>
+          </button>
+        </div>
+
+        <div class="stage-hint">
+          <i data-lucide="info" style="width: 13px; height: 13px; color: var(--accent-warm);"></i>
+          <span>Hover or click masks to reveal words. Use <strong>Remove Mask</strong> or right-click to delete any error.</span>
+        </div>
+      </div>
+
+      <!-- Export Section: Browser-Native Interactive Study Deck -->
+      <div class="actions-grid single-card">
+        <div class="action-card featured">
+          <div class="action-header">
+            <div class="action-icon">
+              <i data-lucide="sparkles" style="width: 20px; height: 20px;"></i>
+            </div>
+            <div class="action-info">
+              <h3>Interactive Study Deck (.html)</h3>
+              <p>Self-contained file. Opens in any web browser (Chrome, Edge, Safari, phone, tablet) with 100% smooth hover & click reveal animations. 100% offline.</p>
+            </div>
+          </div>
+          <div class="action-footer">
+            <span class="badge-tag">Browser Study Deck • 100% Offline</span>
+            <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+              <button id="btn-preview-html" class="btn btn-outline" title="Open and test the study deck directly in your browser tab">
+                <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Open & Test Deck
+              </button>
+              <button id="btn-export-html" class="btn btn-primary">
+                <i data-lucide="download" style="width: 15px; height: 15px;"></i> Download Study Deck (.html)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Dedicated Footer -->
+  <footer>
+    ElyHelper - For my beautiful girl
+  </footer>
+
+  <script src="pdf-generator-v5.js?v=8"></script>
+  <script src="app-v5.js?v=8"></script>
+</body>
+</html>
