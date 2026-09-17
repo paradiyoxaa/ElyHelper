@@ -1,52 +1,45 @@
-# ElyHelper: Interactive Hide-and-Reveal Image-to-PDF Studio
+# ElyHelper — Interactive Hide-and-Reveal Study Deck
 
-**ElyHelper** turns any image containing words (handwritten or typed study notes, textbook diagrams, slides, flashcards) into interactive study materials and PDF files where words are concealed behind masks that reveal when clicked or hovered, and re-hide when clicked again or hovered out.
+**ElyHelper** turns textbook diagrams, anatomy sheets, and study notes into interactive hide-and-reveal study decks where words and labels are concealed behind masks that reveal when hovered or clicked.
+
+Dedicated with love: *"ElyHelper - For my beautiful girl"*
 
 ---
 
-## Key Features
+## ✨ Features
 
-1. **Client-Side OCR Word Detection**:
-   - Powered by **Tesseract.js v5**, detecting text and exact bounding boxes directly inside the browser.
-   - 100% private, local processing — your images and study notes never leave your device.
+1. **Google Gemini Vision AI Detection**:
+   - Uses Gemini AI Vision (`gemini-3.5-flash-lite`) with 2D spatial bounding box detection.
+   - Accurately reads angled, medical, curved, and complex diagram terminology with zero false positives.
+   - Includes built-in local OCR engine fallback if offline.
 
 2. **Interactive Hide-and-Reveal Canvas**:
-   - **Hover Trigger**: Hover over any masked word to peek; mouse out to re-hide.
-   - **Click Trigger**: Click a mask to toggle locked reveal state; click again to conceal.
-   - **Both Mode**: Combine hover peeking with click locking.
-   - **Custom Drawing Tool**: Click and drag to mask any custom diagram element, formula, or word that OCR missed.
-   - **Smart Filters**: Filter by word length (e.g. skip short particles like "a", "the", "in") or search for specific terms.
-   - **Mask Aesthetics**: Switch between Dark Redaction, Highlighter Neon, Frosted Glass Blur, and Flashcard Question Badges (`?`).
+   - **Hover Reveal**: Hover over any masked label to peek; mouse out to re-hide.
+   - **Click Lock**: Click to toggle locked reveal state; click again to conceal.
+   - **Remove Mask Tool (Eraser)**: Click any mask to quickly delete and edit errors. Also supports right-click and double-click deletion.
+   - **Manual Draw & Tap Tools**: Draw a custom box or tap anywhere to mask diagrams, figures, or formulas.
+   - **Matte Night-Light Aesthetic**: Easy on the eyes, sleek warm charcoal design with zero glare.
 
-3. **Multiple Export Formats**:
-   - **Interactive PDF (.pdf)**: High-resolution PDF with embedded AcroForm pushbuttons configured with Acrobat JavaScript Additional Actions (`/AA: E, X, U`). Words reveal and re-hide natively inside Adobe Acrobat Reader, Foxit Reader, and desktop PDF viewers.
-   - **Universal Study Deck (.html)**: Self-contained single-file HTML document with embedded base64 image and interaction logic. Opens on any device (iPhone, iPad, Android, Windows, Mac, Chrome, Safari) with zero installation required.
-   - **Printable Worksheet & Answer Key (.pdf)**: 2-page printout with cloze test questions on page 1 and an organized answer key on page 2.
+3. **Universal Interactive Export**:
+   - **Self-Contained Study Deck (`.html`)**: Double-click to open in Chrome, Edge, Safari, iPad, iPhone, or Android with 100% smooth CSS transitions and zero external dependencies.
 
 ---
 
-## How to Run Locally
+## 🚀 Deployment to Vercel
 
-You can launch ElyHelper with any static file server:
+ElyHelper is optimized for instant deployment on [Vercel](https://vercel.com):
 
-### Option A: Using Python
-```bash
-python -m http.server 8080
-```
-Then open `http://localhost:8080` in your browser.
-
-### Option B: Using Node / npx
-```bash
-npx serve .
-```
-
-### Option C: Direct Browser Launch
-Simply open `index.html` in modern web browsers (Chrome, Edge, Firefox, Safari).
+1. Import this repository into Vercel: **[Deploy to Vercel](https://vercel.com/new/import?s=https%3A%2F%2Fgithub.com%2Fparadiyoxaa%2FElyHelper)**
+2. In Vercel Project Settings → **Environment Variables**, add:
+   - `GEMINI_API_KEY`: `<your_gemini_api_key>`
+3. Click **Deploy**.
 
 ---
 
-## Usage Guide
-1. **Upload or Select Sample**: Drag and drop an image or click "Animal Cell & Organelles" / "Data Structures Sheet" for an instant demo.
-2. **Review Auto-Detected Masks**: Adjust the "Min Letters" slider or draw manual masks over formulas or figures.
-3. **Practice & Test**: Hover or click masks to reveal words and test your memory.
-4. **Export**: Click **Download PDF** for Adobe Acrobat interactive format or **Download HTML** for universal mobile & web review.
+## 💻 Running Locally
+
+To run locally with backend AI support:
+```bash
+node dev-server.js
+```
+Then open `http://localhost:8765` in your browser.
